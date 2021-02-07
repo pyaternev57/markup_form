@@ -8,20 +8,15 @@ from . import db
 class User(UserMixin, db.Model):
 	"""User account model."""
 
-	__tablename__ = 'flasklogin-users'
+	__tablename__ = 'users'
 	id = db.Column(
 		db.Integer,
 		primary_key=True
 	)
-	name = db.Column(
+	username = db.Column(
 		db.String(100),
 		nullable=False,
 		unique=False
-	)
-	email = db.Column(
-		db.String(40),
-		unique=True,
-		nullable=False
 	)
 	password = db.Column(
 		db.String(200),
@@ -29,19 +24,7 @@ class User(UserMixin, db.Model):
 		unique=False,
 		nullable=False
 	)
-	website = db.Column(
-		db.String(60),
-		index=False,
-		unique=False,
-		nullable=True
-	)
 	created_on = db.Column(
-        db.DateTime,
-        index=False,
-        unique=False,
-        nullable=True
-    )
-	last_login = db.Column(
         db.DateTime,
         index=False,
         unique=False,
@@ -58,3 +41,98 @@ class User(UserMixin, db.Model):
 
 	def __repr__(self):
 		return '<User {}>'.format(self.username)
+
+class Notebook(db.Model):
+	"""table with notebook data"""
+
+	__tablename__ = 'notebooks'
+	id = db.Column(
+		db.Integer,
+		primary_key=True
+	)
+	link = db.Column(
+		db.String(100),
+		nullable=False,
+		unique=False
+	)
+	created_on = db.Column(
+        db.DateTime,
+        index=False,
+        unique=False,
+        nullable=True
+    )
+
+class Chunk(db.Model):
+	"""table with chunks data"""
+
+	__tablename__ = 'chunks'
+	id = db.Column(
+		db.Integer,
+		primary_key=True
+	)
+	notebook_id = db.Column(
+		db.Integer,
+		nullable=False,
+		unique=False
+	)
+	chunk_id = db.Column(
+		db.Integer,
+		nullable=False,
+		unique=False
+	)
+	data_format = db.Column(
+		db.String(100),
+		nullable=False,
+		unique=False
+	)
+	graph_vertex = db.Column(
+		db.String(100),
+		nullable=False,
+		unique=False
+	)
+	graph_vertex_subclass = db.Column(
+		db.String(100),
+		nullable=False,
+		unique=False
+	)
+	created_on = db.Column(
+        db.DateTime,
+        index=False,
+        unique=False,
+        nullable=True
+    )
+
+class History(db.Model):
+	__tablename__ = 'history'
+	id = db.Column(
+		db.Integer,
+		primary_key=True
+	)
+	notebook_id = db.Column(
+		db.Integer,
+		nullable=False,
+		unique=False
+	)
+	chunk_id = db.Column(
+		db.Integer,
+		nullable=False,
+		unique=False
+	)
+	user = db.Column(
+		db.String(100),
+		nullable=False,
+		unique=False
+	)
+	created_on = db.Column(
+        db.DateTime,
+        index=False,
+        unique=False,
+        nullable=True
+    )
+
+class Chunk_data:
+	def __init__(self):
+			self.notebook_id = 1
+			self.chunk_id = 1
+			self.href = ""
+			self.data = ""

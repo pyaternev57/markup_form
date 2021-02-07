@@ -12,10 +12,14 @@ class Config:
 
     FLASK_APP = environ.get('FLASK_APP')
     FLASK_ENV = environ.get('FLASK_ENV')
-    SECRET_KEY = environ.get('SECRET_KEY')
+    # SECRET_KEY = environ.get('SECRET_KEY')
+    SECRET_KEY = 'nl2ml'
 
     # Flask-SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI')
+    # CREATE USER 'pyaternev'@'%' IDENTIFIED BY 'testpass';
+    # CREATE USER 'pyaternev'@'localhost' IDENTIFIED BY 'testpass';
+    # grant all  on test.* to pyaternev@localhost
+    SQLALCHEMY_DATABASE_URI = 'mysql://pyaternev:testpass@localhost/nl2ml'
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

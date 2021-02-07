@@ -24,19 +24,17 @@ def signup():
     """
     form = SignupForm()
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(email=form.email.data).first()
+        existing_user = User.query.filter_by(username=form.name.data).first()
         if existing_user is None:
             user = User(
-                name=form.name.data,
-                email=form.email.data,
-                website=form.website.data
+                username=form.name.data,
             )
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
-            login_user(user)  # Log in as newly created user
+            login_user(user, )  # Log in as newly created user
             return redirect(url_for('main_bp.dashboard'))
-        flash('A user already exists with that email address.')
+        flash('A user already exists with that name.')
     return render_template(
         'signup.jinja2',
         title='Create an Account.',
@@ -61,7 +59,7 @@ def login():
     form = LoginForm()
     # Validate login attempt
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()  
+        user = User.query.filter_by(username=form.name.data).first()  
         if user and user.check_password(password=form.password.data):
             login_user(user)
             next_page = request.args.get('next')

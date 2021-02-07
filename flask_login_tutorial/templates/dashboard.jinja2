@@ -1,7 +1,8 @@
 {% extends "layout.jinja2" %}
 
+
 {% block pagestyles %}
-  <link href="{{ url_for('static', filename='dist/css/dashboard.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ url_for('static', filename='dist/css/forms.css') }}" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://use.typekit.net/sus7rlu.css">
 {% endblock %}
 
@@ -9,8 +10,75 @@
   <h1>{{ body }}</h1>
 
   {% if current_user.is_authenticated %}
-    <p>Hi {{ current_user.name }}!</p>
-    <a href="{{ url_for('main_bp.logout') }}">Log out</a>
+    
+    {% block data %}
+  <div>
+  {#
+  <h3 class="title"><a href="{{ data.href }}" target="_blank"> {{ data.href}} </a></h3>
+  <pre><code id="python_code"> 
+  {{ data.data }}
+  </pre>
+  #}
+  </div>
+<div class="formwrapper">
+  <h2 class="title">markup</h2>
+  <form method="POST" action="/">
+    {{ form.csrf_token }}
+    <div class="form-field">{{ form.data_format.label }} {{ form.data_format }}
+      {% if form.data_format.errors %}
+        <ul class="errors">
+          {% for error in form.data_format.errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    <div class="form-field">{{ form.graph_vertex.label }} {{ form.graph_vertex }}
+      {% if form.graph_vertex.errors %}
+        <ul class="errors">
+          {% for error in form.graph_vertex.errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    <div class="form-field">{{ form.graph_vertex_subclass.label }} {{ form.graph_vertex_subclass }}
+      {% if form.graph_vertex_subclass.errors %}
+        <ul class="errors">
+          {% for error in form.graph_vertex_subclass.errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    <div class="form-field">{{ form.errors_in_chunk.label }} {{ form.errors_in_chunk }}
+      {% if form.errors_in_chunk.errors %}
+        <ul class="errors">
+          {% for error in form.errors_in_chunk.errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <div class="form-field">{{ form.mark.label }} {{ form.mark }}
+      {% if form.mark.errors %}
+        <ul class="errors">
+          {% for error in form.mark.errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    </div>
+    {{ form.forward }}
+  </form>
+  <a href="{{ url_for('main_bp.logout') }}">Log out</a>
+</div>
+{% endblock %}
+
+
+
+
+
   {% endif %}
 
 {% endblock %}
