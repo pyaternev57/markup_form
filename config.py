@@ -19,7 +19,7 @@ class Config:
     # CREATE USER 'pyaternev'@'%' IDENTIFIED BY 'testpass';
     # CREATE USER 'pyaternev'@'localhost' IDENTIFIED BY 'testpass';
     # grant all  on test.* to pyaternev@localhost
-    SQLALCHEMY_DATABASE_URI = 'mysql://pyaternev:testpass@localhost/nl2ml'
+    SQLALCHEMY_DATABASE_URI = 'mysql://flask:password@localhost/nl2ml'
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -32,3 +32,7 @@ class Config:
     STATIC_FOLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
     COMPRESSOR_DEBUG = environ.get('COMPRESSOR_DEBUG')
+    MYSQL_USER = 'flask'
+    MYSQL_PASSWORD = 'password'
+    MYSQL_DB = 'nl2ml'
+    MYSQL_HOST = 'localhost'

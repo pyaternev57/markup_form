@@ -100,6 +100,7 @@ def dashboard():
     chunk = ChunkData()
     form = DataForm()
     chunk.notebook_id, chunk.href = get_notebook_id(db, current_user)
+    print(chunk)
     chunk.chunk_id, chunk.data = get_chunk_id(db, current_user, chunk.notebook_id)
     if form.is_submitted():
         write2chunks(db, chunk, form)

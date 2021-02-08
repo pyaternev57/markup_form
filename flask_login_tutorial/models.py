@@ -156,4 +156,4 @@ class ChunkData:
     data = ""
 
     def __repr__(self):
-        return f"notebook_id: {self.notebook_id}; chunk_id: {self.chunk_id}"
+        return f"notebook_id: {self.notebook_id}; chunk_id: {self.chunk_id}; href: {self.href}"
