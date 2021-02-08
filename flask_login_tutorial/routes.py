@@ -48,8 +48,8 @@ def get_notebook_id(db, current_user):
         notebook_id = db.session.query(func.max(History.notebook_id)).first()[0]
         if not notebook_id:
             notebook_id = 0
-    link = db.session.query(Notebook.link).filter_by(id=notebook_id + 1).first()[0]
-    return notebook_id + 1, link
+    link = db.session.query(Notebook.link).filter_by(id=notebook_id).first()[0]
+    return notebook_id, link
 
 
 def get_chunk_id(db, current_user, notebook_id):
@@ -57,7 +57,7 @@ def get_chunk_id(db, current_user, notebook_id):
         .filter_by(username=current_user.username, notebook_id=notebook_id).first()[0]
     print(chunk_id)
     if not chunk_id:
-        chunk_id = -1
+        chunk_id = 0
     chunk_id += 1
     link = db.session.query(Notebook.link).filter_by(id=notebook_id).first()[0]
     print(os.path.exists(f"data/{notebook_id}.pkl"))
@@ -65,12 +65,12 @@ def get_chunk_id(db, current_user, notebook_id):
         data = download_chunks_from_notebook(link)
         save_pkl(data, f"data/{notebook_id}.pkl")
     chunks = open_pkl(f"data/{notebook_id}.pkl")
-    while chunk_id >= len(chunks):
+    while chunk_id > len(chunks):
         notebook_id = db.session.query(func.max(History.notebook_id)).first()[0] + 1
         chunks = download_chunks_from_notebook(link)
         save_pkl(chunks, f"data/{notebook_id}.pkl")
-        chunk_id = 0
-    chunk = chunks[chunk_id]
+        chunk_id = 1
+    chunk = chunks[chunk_id - 1]
     return chunk_id, chunk
 
 
