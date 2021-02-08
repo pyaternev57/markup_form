@@ -1,6 +1,7 @@
 """Database models."""
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
+import datetime
 
 from . import db
 
@@ -28,7 +29,8 @@ class User(UserMixin, db.Model):
         db.DateTime,
         index=False,
         unique=False,
-        nullable=True
+        nullable=False,
+        default=datetime.datetime.utcnow
     )
 
     def set_password(self, password):
@@ -60,7 +62,8 @@ class Notebook(db.Model):
         db.DateTime,
         index=False,
         unique=False,
-        nullable=True
+        nullable=False,
+        default=datetime.datetime.utcnow
     )
 
 
@@ -97,11 +100,22 @@ class Chunk(db.Model):
         nullable=False,
         unique=False
     )
+    errors = db.Column(
+        db.String(10),
+        nullable=False,
+        unique=False
+    )
+    marks = db.Column(
+        db.Integer,
+        nullable=True,
+        unique=False
+    )
     created_on = db.Column(
         db.DateTime,
         index=False,
         unique=False,
-        nullable=True
+        nullable=False,
+        default=datetime.datetime.utcnow
     )
 
 
@@ -121,7 +135,7 @@ class History(db.Model):
         nullable=False,
         unique=False
     )
-    user = db.Column(
+    username = db.Column(
         db.String(100),
         nullable=False,
         unique=False
@@ -130,7 +144,8 @@ class History(db.Model):
         db.DateTime,
         index=False,
         unique=False,
-        nullable=True
+        nullable=False,
+        default=datetime.datetime.utcnow
     )
 
 

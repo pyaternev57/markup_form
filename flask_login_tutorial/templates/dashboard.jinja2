@@ -13,16 +13,14 @@
     
     {% block data %}
   <div>
-  {#
   <h3 class="title"><a href="{{ data.href }}" target="_blank"> {{ data.href}} </a></h3>
   <pre><code id="python_code"> 
   {{ data.data }}
   </pre>
-  #}
   </div>
 <div class="formwrapper">
   <h2 class="title">markup</h2>
-  <form method="POST" action="/">
+  <form method="POST" action="/markup">
     {{ form.csrf_token }}
     <div class="form-field">{{ form.data_format.label }} {{ form.data_format }}
       {% if form.data_format.errors %}
