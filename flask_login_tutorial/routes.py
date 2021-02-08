@@ -47,7 +47,9 @@ def get_notebook_id(db, current_user):
     if not notebook_id:
         notebook_id = db.session.query(func.max(History.notebook_id)).first()[0]
         if not notebook_id:
-            notebook_id = 0
+            notebook_id = 1
+        else:
+            notebook_id += 1
     link = db.session.query(Notebook.link).filter_by(id=notebook_id).first()[0]
     return notebook_id, link
 
