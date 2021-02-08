@@ -8,7 +8,13 @@
 {% block content %}
 
   <div class="return">
-      <span>Add notebooks <a href="{{ url_for('main_bp.add_notebooks') }}"> Add </a></span>
-      <span>Markup Tool <a href="{{ url_for('main_bp.dashboard') }}"> Go </a></span>
-    </div>
+    <form method="get" action="{ url_for('main_bp.add_notebooks') }}">
+        <button type="submit">Add notebooks</button>
+    </form>
+      <form method="get" action="{ url_for('main_bp.dashboard') }}">
+        <button type="submit">Markup Tool</button>
+{#    </form>#}
+{#      <span>Add notebooks <a href="{{ url_for('main_bp.add_notebooks') }}"> Add </a></span>#}
+{#      <span>Markup Tool <a href="{{ url_for('main_bp.dashboard') }}"> Go </a></span>#}
+{#    </div>#}
 {% endblock %}
