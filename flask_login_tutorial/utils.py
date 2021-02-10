@@ -45,7 +45,7 @@ def get_data():
             'Model_Deploy': ['save weights', 'send to prod environment']}
 
 
-def prepared_chunk(chunk):
+def prepared_chunk(chunk, output):
     old_chunk = chunk.split('\n')
     new_chunk = []
     n = 60
@@ -53,7 +53,12 @@ def prepared_chunk(chunk):
         parts = ['    ' + line[i:i + n] if i > 0 else line[i:i + n] for i in range(0, len(line), n)]
         new_chunk.extend(parts)
     # print('<br/>'.join(new_chunk))
-    return '<br/>'.join(new_chunk)
+    old_outputs = output
+    new_output = []
+    for line in old_outputs:
+        parts = ['    ' + line[i:i + n] if i > 0 else line[i:i + n] for i in range(0, len(line), n)]
+        new_output.extend(parts)
+    return '<br/>'.join(new_chunk), '<br/>'.join(new_output)
 
 
 def save_pkl(data, path):
@@ -70,7 +75,7 @@ def open_pkl(path):
 def download_chunks_from_notebook(link):
     author, name = link.split('/')[-2], link.split('/')[-1]
     kaggle.api.kernels_pull(f"{author}/{name}", 'notebooks')
-    data = [prepared_chunk(el['source']) for el in json.load(open(f"notebooks/{name}.ipynb"))["cells"] if
+    data = [prepared_chunk(el['source'], el['outputs']) for el in json.load(open(f"notebooks/{name}.ipynb"))["cells"] if
             el["cell_type"] == 'code']
     return data
 

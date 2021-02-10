@@ -54,15 +54,8 @@ def get_notebook_id(db, current_user):
     return notebook_id, link
 
 
-def get_chunk_id(db, current_user, notebook_id):
-    chunk_id = db.session.query(func.max(History.chunk_id)) \
-        .filter_by(username=current_user.username, notebook_id=notebook_id).first()[0]
-    print(chunk_id)
-    if not chunk_id:
-        chunk_id = 0
-    chunk_id += 1
+def get_chunk_data(db, notebook_id, chunk_id):
     link = db.session.query(Notebook.link).filter_by(id=notebook_id).first()[0]
-    print(os.path.exists(f"data/{notebook_id}.pkl"))
     if not os.path.exists(f"data/{notebook_id}.pkl"):
         data = download_chunks_from_notebook(link)
         save_pkl(data, f"data/{notebook_id}.pkl")
@@ -73,7 +66,29 @@ def get_chunk_id(db, current_user, notebook_id):
         save_pkl(chunks, f"data/{notebook_id}.pkl")
         chunk_id = 1
     chunk = chunks[chunk_id - 1]
+    return chunk
+
+
+def get_next_chunk_id(db, current_user, notebook_id):
+    chunk_id = db.session.query(func.max(History.chunk_id)) \
+        .filter_by(username=current_user.username, notebook_id=notebook_id).first()[0]
+    if not chunk_id:
+        chunk_id = 0
+    chunk_id += 1
+    chunk = get_chunk_data(db, notebook_id, chunk_id)
     return chunk_id, chunk
+
+
+def get_prev_ids(db, current_user):
+    history = db.session.query(History.notebook_id, History.chunk_id)\
+                  .filter_by(username=current_user.username)\
+                  .order_by(History.created_on.desc()).all()[:2]
+    if len(history) < 2:
+        notebook_id, chunk_id = history[0]
+    else:
+        notebook_id, chunk_id = history[1]
+    link = db.session.query(Notebook.link).filter_by(id=notebook_id).first()[0]
+    return notebook_id, chunk_id, link
 
 
 def add_notebook_by_link(db, link):
@@ -102,12 +117,37 @@ def dashboard():
     chunk = ChunkData()
     form = DataForm()
     chunk.notebook_id, chunk.href = get_notebook_id(db, current_user)
-    print(chunk)
-    chunk.chunk_id, chunk.data = get_chunk_id(db, current_user, chunk.notebook_id)
+    chunk.chunk_id, chunk.data = get_next_chunk_id(db, current_user, chunk.notebook_id)
     if form.is_submitted():
         write2chunks(db, chunk, form)
         write2history(db, current_user, chunk)
-        return redirect(url_for('main_bp.dashboard'))
+        if form.forward.data:
+            return redirect(url_for('main_bp.dashboard'))
+        elif form.back.data:
+            return redirect(url_for('main_bp.back'))
+    return render_template(
+        'dashboard.jinja2',
+        title='markup tool',
+        template='dashboard-template',
+        current_user=current_user,
+        form=form,
+        data=chunk
+    )
+
+@main_bp.route('/markup/back', methods=['GET', 'POST'])
+@login_required
+def back():
+    chunk = ChunkData()
+    form = DataForm()
+    chunk.notebook_id, chunk.chunk_id, chunk.href = get_prev_ids(db, current_user)
+    chunk.data = get_chunk_data(db, chunk.notebook_id, chunk.chunk_id)
+    if form.is_submitted():
+        write2chunks(db, chunk, form)
+        write2history(db, current_user, chunk)
+        if form.forward.data:
+            return redirect(url_for('main_bp.dashboard'))
+        elif form.back.data:
+            return redirect(url_for('main_bp.back'))
     return render_template(
         'dashboard.jinja2',
         title='markup tool',

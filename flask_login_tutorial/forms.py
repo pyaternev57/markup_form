@@ -67,8 +67,14 @@ class DataForm(FlaskForm):
         "graph_vertex_subclass", [DataRequired()],
     )
     errors_in_chunk = SelectField("errors", choices=["No", "Yes"])
-    mark = SelectField("marks", choices=[1, 2, 3, 4, 5])
-    forward = SubmitField("Next")
+    mark = SelectField("marks", choices=[
+        (5, "идеально соответствует"),
+        (4, "почти соответствует"),
+        (3, "скорее соттвествует"),
+        (2, "скорее не соттвествует"),
+        (1, "почти не соответствует")])
+    back = SubmitField("back")
+    forward = SubmitField("next")
 
 
     def validate_graph_vertex_subclass(form, field):
