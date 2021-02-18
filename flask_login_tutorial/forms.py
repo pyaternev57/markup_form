@@ -63,8 +63,11 @@ class DataForm(FlaskForm):
     graph_vertex = SelectField(
         "graph_vertex", choices=list(data.keys())
     )
-    graph_vertex_subclass = StringField(
-        "graph_vertex_subclass", [DataRequired()],
+    # graph_vertex_subclass = StringField(
+    #     "graph_vertex_subclass", [DataRequired()],
+    # )
+    graph_vertex_subclass = SelectField(
+        "graph_vertex_subclass", choices=[]
     )
     errors_in_chunk = SelectField("errors", choices=["No", "Yes"])
     mark = SelectField("marks", choices=[
@@ -78,5 +81,6 @@ class DataForm(FlaskForm):
 
 
     def validate_graph_vertex_subclass(form, field):
+
         if field.data not in form.data[form.graph_vertex.data]:
             raise ValidationError('Please check filed ')

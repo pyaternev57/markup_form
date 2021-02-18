@@ -118,6 +118,29 @@ class Chunk(db.Model):
         default=datetime.datetime.utcnow
     )
 
+class Graph(db.Model):
+    __tablename__ = 'graph_vertexes'
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    graph_vertex = db.Column(
+        db.String(100),
+        nullable=False,
+        unique=False
+    )
+    graph_vertex_subclass = db.Column(
+        db.String(100),
+        nullable=False,
+        unique=False
+    )
+    created_on = db.Column(
+        db.DateTime,
+        index=False,
+        unique=False,
+        nullable=False,
+        default=datetime.datetime.utcnow
+    )
 
 class History(db.Model):
     __tablename__ = 'history'

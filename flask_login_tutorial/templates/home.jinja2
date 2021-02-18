@@ -8,6 +8,9 @@
 {% block content %}
 
   <div class="return">
+    <form method="get" action="{{ url_for('main_bp.add_vertexes') }}">
+        <button type="submit">Add vertexes</button>
+    </form>
     <form method="get" action="{{ url_for('main_bp.add_notebooks') }}">
         <button type="submit">Add notebooks</button>
     </form>

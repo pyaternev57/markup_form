@@ -68,17 +68,28 @@
       {% endif %}
     </div>
     </div>
-    {{ form.back }}
+    {{ form.back(formnovalidate=True) }}
     {{ form.forward }}
   </form>
+    <script>
+        graph_vertex_select = document.getElementById("graph_vertex");
+        graph_vertex_subclass_select = document.getElementById("graph_vertex_subclass");
+
+        graph_vertex_select.onchange = function() {
+            graph_vertex = graph_vertex_select.value;
+            fetch('/graph_vertex_subclass/' + graph_vertex).then(function (response) {
+                response.json().then(function (data) {
+                    optionHTML = '';
+                    for (let subclass of data.subclasses) {
+                        optionHTML += '<option value="' + subclass.id + '">' + subclass.name + '</option>';
+                    }
+                    graph_vertex_subclass_select.innerHTML = optionHTML;
+                });
+            });
+        }
+    </script>
   <a href="{{ url_for('main_bp.logout') }}">Log out</a>
 </div>
 {% endblock %}
-
-
-
-
-
-  {% endif %}
-
+    {% endif %}
 {% endblock %}

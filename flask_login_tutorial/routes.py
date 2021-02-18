@@ -1,10 +1,10 @@
 """Logged-in page routes."""
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required, logout_user
 from .forms import DataForm
-from .models import ChunkData, Notebook, Chunk, History, db
+from .models import Graph, ChunkData, Notebook, Chunk, History, db
 from sqlalchemy.sql.expression import func
-from .utils import open_pkl, save_pkl, download_chunks_from_notebook
+from .utils import open_pkl, save_pkl, download_chunks_from_notebook, get_data
 import pandas as pd
 import os
 
@@ -98,6 +98,14 @@ def add_notebook_by_link(db, link):
     db.session.add(notebook)
     db.session.commit()
 
+def add_vertex(db, graph_vertex, graph_vertex_subclass):
+    vertex = Graph(
+        graph_vertex=graph_vertex,
+        graph_vertex_subclass=graph_vertex_subclass
+    )
+    db.session.add(vertex)
+    db.session.commit()
+
 
 @main_bp.route('/', methods=['GET'])
 @login_required
@@ -116,6 +124,9 @@ def home():
 def dashboard():
     chunk = ChunkData()
     form = DataForm()
+    form.graph_vertex_subclass.choices = [(vertex.id, vertex.graph_vertex_subclass) for vertex in
+                                          Graph.query.filter_by(graph_vertex="Hyperparam_Tuning").all()]
+    print(form.graph_vertex_subclass.choices)
     chunk.notebook_id, chunk.href = get_notebook_id(db, current_user)
     chunk.chunk_id, chunk.data = get_next_chunk_id(db, current_user, chunk.notebook_id)
     if form.is_submitted():
@@ -139,6 +150,8 @@ def dashboard():
 def back():
     chunk = ChunkData()
     form = DataForm()
+    form.graph_vertex_subclass.choices = [(vertex.id, vertex.graph_vertex_subclass) for vertex in
+                                         Graph.query.filter_by(graph_vertex="Hyperparam_Tuning")]
     chunk.notebook_id, chunk.chunk_id, chunk.href = get_prev_ids(db, current_user)
     chunk.data = get_chunk_data(db, chunk.notebook_id, chunk.chunk_id)
     if form.is_submitted():
@@ -157,8 +170,8 @@ def back():
         data=chunk
     )
 
-
-@main_bp.route("/add", methods=['GET', 'POST'])
+# TODO function for deleting notebooks
+@main_bp.route("/add_notebooks", methods=['GET', 'POST'])
 @login_required
 def add_notebooks():
     path2csv = "notebooks.csv"
@@ -167,12 +180,33 @@ def add_notebooks():
         if not db.session.query(Notebook).filter_by(link=link).first():
             add_notebook_by_link(db, link)
         else:
-            print('This notebook has already added')
+            print(f'This notebook {link} has already added')
     return render_template(
         'add.jinja2',
         title='add notebooks',
         template='dashboard-template',
-        current_user=current_user
+        current_user=current_user,
+        text="notebooks"
+    )
+
+# TODO function for deleting vertex and cgange get_data to read from file
+@main_bp.route("/add_vertexes", methods=['GET', 'POST'])
+@login_required
+def add_vertexes():
+    data = get_data()
+    for graph_vertex in data.keys():
+        for graph_vertex_subclass in data[graph_vertex]:
+            if not db.session.query(Graph).filter_by(graph_vertex=graph_vertex,
+                                                     graph_vertex_subclass=graph_vertex_subclass).first():
+                add_vertex(db, graph_vertex, graph_vertex_subclass)
+            else:
+                print(f'This vertex {graph_vertex}: {graph_vertex_subclass} has already added')
+    return render_template(
+        'add.jinja2',
+        title='add notebooks',
+        template='dashboard-template',
+        current_user=current_user,
+        text="vertexes"
     )
 
 
@@ -182,3 +216,15 @@ def logout():
     """User log-out logic."""
     logout_user()
     return redirect(url_for('auth_bp.login'))
+
+@main_bp.route("/graph_vertex_subclass/<graph_vertex>", methods=['GET', 'POST'])
+@login_required
+def graph_vertex_subclass(graph_vertex):
+    subclasses = db.session.query(Graph.id, Graph.graph_vertex_subclass).filter_by(graph_vertex=graph_vertex).all()
+    choicesArr = []
+    for subclass in subclasses:
+        choiceObj = {}
+        choiceObj["id"] = subclass[0]
+        choiceObj["name"] = subclass[1]
+        choicesArr.append(choiceObj)
+    return jsonify({"subclasses": choicesArr})
