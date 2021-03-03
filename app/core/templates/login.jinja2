@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "bootstrap/form.html" as wtf %}
+
+{% block content %}
+    <nav>  <a href="{{ url_for("main_bp.login") }}" class="btn btn-success"> Sign up</a> </nav>
+
+ <div class="container h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+      <form class="col-4" method="POST">
+          {{ form.csrf_token }}
+        {{ wtf.render_form(form)  }}
+      </form>
+  </div>
+ </div>
+
+{% endblock %}

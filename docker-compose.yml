@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  db:
+    image: mariadb/server:10.4
+    ports:
+      - "4000:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: "root"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/:ro
+      - ./db-data/:/var/lib/mysql
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=root --execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 60s
+      retries: 15
+
+  app:
+    build: ./app
+    links:
+      - db
+    ports:
+      - "5000:5000"
+    environment:
+      SECRET_KEY: "nl2ml"
+      UPLOAD_FOLDER: "/app/upload"
+      SQLALCHEMY_DATABASE_URI: "mysql+pymysql://root:root@db:3306/nl2ml"
+    volumes:
+      - ./upload:/app/upload
+    healthcheck:
+      test: "curl http://0.0.0.0:5000/healthcheck"
+      interval: 2s
+      timeout: 60s
+      retries: 15

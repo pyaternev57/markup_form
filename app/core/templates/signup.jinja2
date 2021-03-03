@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "bootstrap/form.html" as wtf %}
+
+{% block content %}
+
+ <div class="container h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+      <form class="col-4"  method="POST">
+        {{ wtf.render_form(form)  }}
+      </form>
+  </div>
+ </div>
+
+{% endblock %}

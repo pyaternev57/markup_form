@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% import "bootstrap/form.html" as wtf %}
+
+{% block content %}
+
+  <div class="container h-100">
+  <div class="row h-100 justify-content-center align-items-center">
+      <form class="col-md-6"  method="POST"  enctype="multipart/form-data">
+{#        <p>All {{ text }} are added!</p>#}
+{#      <span>Return to markup <a href="{{ url_for('main_bp.markup') }}" class="btn btn-secondary"> Return </a></span>#}{{ form.csrf_token }}
+          {{ form.csrf_token }}
+          {{ wtf.render_form(form)  }}
+      </form>
+  </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,43 @@
+<html lang="en">
+    <head>
+        {% block head %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        {% block styles %}
+            <!-- Bootstrap CSS -->
+            {{ bootstrap.load_css() }}
+        {% endblock %}
+
+        <title>Your page title</title>
+        {% endblock %}
+    </head>
+    <body>
+       {% if current_user.is_authenticated %}
+        <nav class="navbar navbar-light bg-light justify-content-between">
+<!--            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Log out</button>-->
+            <a href="/logout" class="btn btn-outline-danger my-2 my-sm-0">Log out</a>
+
+<!--                <form class="form-inline my-2 my-lg-0">-->
+<!--              <input class="form-control mr-sm-2" type="search" placeholder="id" aria-label="Search">-->
+              <a href="{{ url_for('main_bp.home')}}" class="btn btn-outline-success my-2 my-sm-0" type="submit">Home</a>
+<!--                </form>-->
+
+        </nav>
+     {% endif %}
+        {% if not current_user.is_authenticated %}
+        <nav class="navbar navbar-light bg-light justify-content-between">
+<!--            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Log out</button>-->
+            <a href="{{ '/' +  ''.join(text.split()).lower()}}" class="btn btn-success my-2 my-sm-0">{{ text }}</a>
+        </nav>
+     {% endif %}
+        <!-- Your page content -->
+        {% block content %}{% endblock %}
+
+        {% block scripts %}
+            <!-- Optional JavaScript -->
+            {{ bootstrap.load_js() }}
+        {% endblock %}
+    </body>
+</html>

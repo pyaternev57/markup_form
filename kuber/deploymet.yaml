@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nl2ml-form
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: nl2ml-form
+  name: nl2ml-form-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/limit-connections: '200'
+    nginx.ingress.kubernetes.io/limit-rps: '10'
+    nginx.ingress.kubernetes.io/limit-rpm: '60'
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
+spec:
+  tls:
+  - hosts:
+    - nl2ml-form.coresearch.club
+    secretName: nl2ml-form-tls
+  rules:
+  - host: nl2ml-form.coresearch.club
+    http:
+      paths:
+       -  backend:
+            serviceName: nl2ml-form-svc
+            servicePort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: nl2ml-form
+  name: nl2ml-form-svc
+spec:
+  ports:
+  - name: https
+    port: 5000
+    targetPort: 5000
+  selector:
+    app: nl2ml-form
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: nl2ml-form
+  name: nl2ml-form
+spec:
+  minReadySeconds: 30
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nl2ml-form
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nl2ml-form
+    spec:
+      containers:
+      - name: nl2ml-form
+        image: registry.gitlab.com/lambda-hse/nl2ml-grp/markup:prod
+        #command: ["bash","-c","sleep 99999"]
+        imagePullPolicy: Always
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        volumeMounts:
+        - name: config
+          mountPath: /app/config.py
+          readOnly: true
+          subPath: config.py
+        - name: data
+          mountPath: /app/upload
+      imagePullSecrets:
+        - name: regcred-nl2ml
+      terminationGracePeriodSeconds: 15
+      volumes:
+        - name: config
+          configMap:
+            name: nl2ml-form-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: nl2ml-form-claim        

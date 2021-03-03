@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "bootstrap/form.html" as wtf %}
+
+{% block content %}
+    <div class="container">
+    <div class="row align-items-start">
+        <div class=".col-12 .col-md-8">
+            <span>notebook_id: {{  data.notebook_id }}, chunk_id: {{  data.chunk_id }}</span>
+            <h4 class="title"><a href="{{ data.href }}" target="_blank"> {{ data.href}} </a></h4>
+        </div>
+
+    </div>
+    <div class="row align-items-start">
+        <div class="col-md-6">
+        <pre><code id="python_code"> {{ data.data[0] }} </code>
+    </div>
+    <form class="col-md-6"  method="POST">
+        {{ form.csrf_token }}
+    {{ wtf.render_form(form)  }}
+        <script>
+        graph_vertex_select = document.getElementById("graph_vertex");
+        graph_vertex_subclass_select = document.getElementById("graph_vertex_subclass");
+
+        graph_vertex_select.onchange = function() {
+            graph_vertex = graph_vertex_select.value;
+            fetch('/graph_vertex_subclass/' + graph_vertex).then(function (response) {
+                response.json().then(function (data) {
+                    optionHTML = '';
+                    for (let subclass of data.subclasses) {
+                        optionHTML += '<option value="' + subclass.id + '">' + subclass.name + '</option>';
+                    }
+                    graph_vertex_subclass_select.innerHTML = optionHTML;
+                });
+            });
+        }
+    </script>
+    </form>
+    </div>
+    </div>
+{% endblock %}

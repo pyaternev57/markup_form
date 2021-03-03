@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: nl2ml-form
+  name: nl2ml-form-db-svc
+spec:
+  ports:
+  - name: db
+    port: 3306
+    targetPort: 3306
+  selector:
+    app: nl2ml-form-db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: nl2ml-form
+  name: nl2ml-form-db
+spec:
+  selector:
+    matchLabels:
+      app: nl2ml-form-db
+  serviceName: "nl2ml-form-db-svc"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nl2ml-form-db
+    spec:
+      containers:
+      - name: nl2ml-form-db
+        env:
+         - name: MARIADB_ROOT_PASSWORD
+           value: "root" 
+        image: mariadb/server:10.4
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: nl2ml-form-db
+        - name: initscript
+          mountPath: /docker-entrypoint-initdb.d/
+        ports:
+        - containerPort: 3306
+          name: db-port
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+        ports:
+        - containerPort: 3306
+          name: db-port
+          protocol: TCP
+      terminationGracePeriodSeconds: 15
+      volumes:
+      - name: nl2ml-form-db
+        persistentVolumeClaim:
+          claimName: nl2ml-form-db-claim
+      - name: initscript
+        configMap:
+          name: nl2ml-form-db-initscript
